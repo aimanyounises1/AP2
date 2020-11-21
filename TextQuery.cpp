@@ -60,5 +60,4 @@ void TextQuery::display_map()
       //  os << "\t(line " << num + 1 << ") " 
         //    << *(qr.file->begin() + num) << std::endl;
     //}
-    //return os;
-//}
+    //return os;}

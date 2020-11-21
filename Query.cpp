@@ -15,7 +15,7 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
     string sText;
     string s1;
     string s2;
-    if (s.substr(0, 3) == "AND")
+    if (s.substr(0, 3) == "AND" && s.at(3) == ' ')
     {
         sText = s.substr(4, s.length());
         size_t i = sText.find(" ");
@@ -23,21 +23,29 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
     }
-    else if (s.substr(0, 2) == "OR")
+    else if (s.substr(0, 2) == "OR" && s.at(2) == ' ')
     {
         sText = s.substr(3, s.length());
         size_t i = sText.find(" ");
         s1 = sText.substr(0, i);
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
-    }else if(s.substr(0, 2) == "AD"){
-          sText = s.substr(3, s.length());
+    }
+    else if (s.substr(0, 2) == "AD" && s.at(2) == ' ')
+    {
+        sText = s.substr(3, s.length());
         size_t i = sText.find(" ");
         s1 = sText.substr(0, i);
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new AdjacentQuery(s1, s2));
-    }else
+    }
+    else if (!((s.at(2)==' '||s.at(3) == ' ') 
+    &&(s.substr(0, 2) == "AD" || s.substr(0, 3) == "AND"||s.substr(0, 2) == "OR")))
     {
+        cout << "Unrecognized search"<< endl;
+        exit(1);
+    }else{
+        
         return std::shared_ptr<QueryBase>(new WordQuery(s));
     }
 }
@@ -65,24 +73,25 @@ QueryResult AdjacentQuery::eval(const TextQuery &text) const
     QueryResult left_result = text.query(left_query);
     QueryResult right_result = text.query(right_query);
     auto ret_lines1 = make_shared<set<line_no>>(left_result.begin(), left_result.end());
-    auto ret_lines = make_shared<set<line_no>>(right_result.begin(),right_result.end());
-    auto ret =  make_shared<set<line_no>>();
-    for (int i  : *ret_lines1)
+    auto ret_lines = make_shared<set<line_no>>(right_result.begin(), right_result.end());
+    auto ret = make_shared<set<line_no>>();
+    for (int i : *ret_lines1)
     {
-       for ( int j : *ret_lines)
-       {
-           if (i == j+1)
-           {
-               ret->insert(i);
-               break;
-           }else if(i == j - 1) {
-               ret->insert(j - 1);
-               break;
-           }
-       }
+        for (int j : *ret_lines)
+        {
+            if (i == j + 1)
+            {
+                ret->insert(i);
+                break;
+            }
+            else if (i == j - 1)
+            {
+                ret->insert(j - 1);
+                break;
+            }
+        }
     }
-    
-    return QueryResult(rep(),ret,left_result.get_file());
+    return QueryResult(rep(),ret, left_result.get_file());
 }
 /////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////

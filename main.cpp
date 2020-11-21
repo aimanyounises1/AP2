@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     ifstream infile(argv[1]);
     if (!infile) { cerr << "No input file!" << endl; exit(1); }
     TextQuery tq(infile);
-//  tq.display_map();
+ tq.display_map();
     while (true)
     {
     cout << "Enter search command, or q to quit:" << endl;
