@@ -39,14 +39,12 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new AdjacentQuery(s1, s2));
     }
-    else if (!((s.at(2)==' '||s.at(3) == ' ') 
-    &&(s.substr(0, 2) == "AD" || s.substr(0, 3) == "AND"||s.substr(0, 2) == "OR")))
+    else if (!s.find(" "))
     {
-        cout << "Unrecognized search"<< endl;
-        exit(1);
+return std::shared_ptr<QueryBase>(new WordQuery(s));
+        //exit(1);
     }else{
-        
-        return std::shared_ptr<QueryBase>(new WordQuery(s));
+        cout << "Unrecognized search" << endl;
     }
 }
 QueryResult AndQuery::eval(const TextQuery &text) const
@@ -57,6 +55,7 @@ QueryResult AndQuery::eval(const TextQuery &text) const
     set_intersection(left_result.begin(), left_result.end(),
                      right_result.begin(), right_result.end(),
                      inserter(*ret_lines, ret_lines->begin()));
+    
     return QueryResult(rep(), ret_lines, left_result.get_file());
 }
 QueryResult OrQuery::eval(const TextQuery &text) const
