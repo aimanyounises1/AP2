@@ -12,6 +12,7 @@ using namespace std;
 /////////////////////////////////////////////////////////
 shared_ptr<QueryBase> QueryBase::factory(const string &s)
 {
+    
     string sText;
     string s1;
     string s2;
@@ -39,12 +40,13 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new AdjacentQuery(s1, s2));
     }
-    else if (!s.find(" "))
+    else if (s.find(" ") == -1)
     {
-return std::shared_ptr<QueryBase>(new WordQuery(s));
+      return std::shared_ptr<QueryBase>(new WordQuery(s));
         //exit(1);
     }else{
         cout << "Unrecognized search" << endl;
+        return NULL;
     }
 }
 QueryResult AndQuery::eval(const TextQuery &text) const
@@ -81,11 +83,13 @@ QueryResult AdjacentQuery::eval(const TextQuery &text) const
             if (i == j + 1)
             {
                 ret->insert(i);
+                ret->insert(j + 1);
                 break;
             }
             else if (i == j - 1)
             {
                 ret->insert(j - 1);
+                ret->insert(i);
                 break;
             }
         }
