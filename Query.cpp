@@ -22,6 +22,7 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         size_t i = sText.find(" ");
         s1 = sText.substr(0, i);
         s2 = sText.substr(i + 1, s.length());
+        cout << "s1 is "<< s1 << " s2 is  = "<< s2<< endl;
         return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
     }
     else if (s.substr(0, 2) == "OR" && s.at(2) == ' ')
@@ -46,7 +47,7 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         //exit(1);
     }else{
         cout << "Unrecognized search" << endl;
-        return NULL;
+      //  return NULL;
     }
 }
 QueryResult AndQuery::eval(const TextQuery &text) const
@@ -83,12 +84,12 @@ QueryResult AdjacentQuery::eval(const TextQuery &text) const
             if (i == j + 1)
             {
                 ret->insert(i);
-                ret->insert(j + 1);
+                ret->insert(j );
                 break;
             }
             else if (i == j - 1)
             {
-                ret->insert(j - 1);
+                ret->insert(j);
                 ret->insert(i);
                 break;
             }
