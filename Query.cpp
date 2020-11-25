@@ -137,10 +137,18 @@ std::ostream &print(std::ostream &os, const QueryResult &qr)
         {
             if (v[i] + 1   ==  v[i + 1])
             {
-                  os << "\t(line " << v[i] + 1 << ") "
+                if ( i + 1 < v.size() - 1)
+                {
+                os << "\t(line " << v[i] + 1 << ") "
                << *(qr.file->begin() + v[i]) + "\n"
                << "\t(line " << v[i + 1] + 1 << ") " << 
-              *(qr.file->begin() + v[i + 1]) << std::endl;
+              *(qr.file->begin() + v[i + 1]) + "\n"<<endl;
+                }else { 
+                     os << "\t(line " << v[i] + 1 << ") "
+               << *(qr.file->begin() + v[i]) + "\n"
+               << "\t(line " << v[i + 1] + 1 << ") " << 
+              *(qr.file->begin() + v[i + 1])<<endl;
+              }
               //i++;
             } 
         }
