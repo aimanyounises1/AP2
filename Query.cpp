@@ -19,12 +19,12 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         {
             count++;
         }
-    }   
+    }
     string sText;
     string s1;
     string s2;
     bool ans = !(s1.empty() && s2.empty());
-    if (s.substr(0, 3) == "AND" && s.at(3) == ' '&& count == 2 )
+    if (s.substr(0, 3) == "AND" && s.at(3) == ' ' && count == 2)
     {
         sText = s.substr(4, s.length());
         size_t i = sText.find(" ");
@@ -32,7 +32,7 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
     }
-    else if (s.substr(0, 2) == "OR" && s.at(2) == ' ' && count  == 2)
+    else if (s.substr(0, 2) == "OR" && s.at(2) == ' ' && count == 2)
     {
         sText = s.substr(3, s.length());
         size_t i = sText.find(" ");
@@ -40,7 +40,7 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         s2 = sText.substr(i + 1, s.length());
         return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
     }
-    else if (s.substr(0, 2) == "AD" && s.at(2) == ' '&&count  == 2)
+    else if (s.substr(0, 2) == "AD" && s.at(2) == ' ' && count == 2)
     {
         sText = s.substr(3, s.length());
         size_t i = sText.find(" ");
@@ -113,28 +113,36 @@ std::ostream &print(std::ostream &os, const QueryResult &qr)
     size_t i = s.find(" ");
     if (s == "Unrecognized search")
     {
-        os<< "Unrecognized search";
+        os << "Unrecognized search \n";
     }
-   else if (s.substr(0, i) == "AD")
+    else if (s.substr(0, i) == "AD")
     {
-        int count =  0;
-        std::vector <int> v;
+        int count = 0;
+        std::vector<int> v;
         for (auto i : *qr.lines)
         {
-           v.push_back(i);
+            v.push_back(i);
         }
-       for(int i = 0 ;i < v.size() -1; i++){
-           if (v[i] + 1 == v[i+1])
-           {
-               count++;
-           }
-       }
+        for (int i = 0; i < v.size() - 1; i++)
+        {
+            if (v[i] + 1 == v[i + 1])
+            {
+                count++;
+            }
+        }
         os << "\"" << qr.sought << "\""
            << " occurs " << count << " times:" << std::endl;
-        for (auto num : *qr.lines)
+        count = 0;
+        for (int i = 0 ; i < v.size(); i++)
         {
-            os << "\t(line " << num + 1 << ") "
-               << *(qr.file->begin() + num) << std::endl;
+            if (v[i] + 1   ==  v[i + 1])
+            {
+                  os << "\t(line " << v[i] + 1 << ") "
+               << *(qr.file->begin() + v[i]) + "\n"
+               << "\t(line " << v[i + 1] + 1 << ") " << 
+              *(qr.file->begin() + v[i + 1]) + "\n" << std::endl;
+              //i++;
+            } 
         }
     }
     else
@@ -150,3 +158,12 @@ std::ostream &print(std::ostream &os, const QueryResult &qr)
     return os;
 }
 /////////////////////////////////////////////////////////
+/* 2 3 4 5
+  line 2
+  line 3
+
+  line 3 
+  line 4
+
+  line 4
+  line 5                    */
