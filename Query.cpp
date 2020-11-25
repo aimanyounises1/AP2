@@ -140,7 +140,7 @@ std::ostream &print(std::ostream &os, const QueryResult &qr)
                   os << "\t(line " << v[i] + 1 << ") "
                << *(qr.file->begin() + v[i]) + "\n"
                << "\t(line " << v[i + 1] + 1 << ") " << 
-              *(qr.file->begin() + v[i + 1]) + "\n" << std::endl;
+              *(qr.file->begin() + v[i + 1]) << std::endl;
               //i++;
             } 
         }
