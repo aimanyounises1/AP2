@@ -30,6 +30,8 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         size_t i = sText.find(" ");
         s1 = sText.substr(0, i);
         s2 = sText.substr(i + 1, s.length());
+        s1.erase(remove_if(s1.begin(),s1.end(),::isspace),s1.end());
+        s2.erase(remove_if(s2.begin(),s2.end(),::isspace),s2.end());
         return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
     }
     else if (s.substr(0, 2) == "OR" && s.at(2) == ' ' && count == 2)
@@ -38,6 +40,8 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
         size_t i = sText.find(" ");
         s1 = sText.substr(0, i);
         s2 = sText.substr(i + 1, s.length());
+        s1.erase(remove_if(s1.begin(),s1.end(),::isspace),s1.end());
+        s2.erase(remove_if(s2.begin(),s2.end(),::isspace),s2.end());
         return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
     }
     else if (s.substr(0, 2) == "AD" && s.at(2) == ' ' && count == 2)
