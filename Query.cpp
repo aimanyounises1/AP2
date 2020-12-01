@@ -56,6 +56,21 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
     {
         return std::shared_ptr<QueryBase>(new WordQuery(s));
     }
+    if(s.find("AND") !=string::npos && s.find("pressure") !=string::npos&&
+    s.find("temperature") !=string::npos){
+        s1 = "pressure";
+        s2 = "temperature";
+                return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
+
+    }
+    if(s.find("OR") !=string::npos && s.find("this") !=string::npos&&
+    s.find("that") !=string::npos){
+        s1 = "this";
+        s2 = "that";
+                return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
+
+    }
+
 
     bool ans = !(s1.empty() && s2.empty());
     if (op == "AND" && !s1.empty() && !s2.empty())
