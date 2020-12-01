@@ -35,8 +35,6 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
     int count = 0;
     if (s.find("  ")!=string::npos)
     {
-        cout << s.find("  ")<<endl;
-         cout << "before segemenation fault1" << endl;
         v = split(s, "  ");
         if(v.size() == 3){
         op = v[0];
@@ -47,13 +45,11 @@ shared_ptr<QueryBase> QueryBase::factory(const string &s)
     }
     else if (s.find(" ")!= string::npos && count == 0)
     {
-        cout << "before segemenation fault2" << endl;
         v = split(s," ");
         if(v.size() == 3){
         op = v[0];
         s1 = v[1];
         s2 = v[2];
-        cout << op << s1 << s2<<endl;
         }
     }
     else
