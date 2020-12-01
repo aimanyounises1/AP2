@@ -10,52 +10,72 @@
 #include <regex>
 using namespace std;
 /////////////////////////////////////////////////////////
+vector<string> split(const string &parse, string delimiter)
+{
+    vector<string> list;
+    string s = parse;
+    size_t pos = 0;
+    string token;
+    while ((pos = s.find(delimiter)) != string::npos)
+    {
+        token = s.substr(0, pos);
+        list.push_back(token);
+        s.erase(0, pos + delimiter.length());
+    }
+    list.push_back(s);
+    return list;
+}
 shared_ptr<QueryBase> QueryBase::factory(const string &s)
 {
-    int count = 0;
-    for (size_t i = 0; i < s.length(); i++)
-    {
-        if (s[i] == ' ')
-        {
-            count++;
-        }
-    }
+    vector<string> v;
     string sText;
     string s1;
     string s2;
-    bool ans = !(s1.empty() && s2.empty());
-    if (s.substr(0, 3) == "AND" && s.at(3) == ' ' && count == 2)
+    string op;
+    int count = 0;
+    if (s.find("  ")!=string::npos)
     {
-        sText = s.substr(4, s.length());
-        size_t i = sText.find(" ");
-        s1 = sText.substr(0, i);
-        s2 = sText.substr(i + 1, s.length());
-        s1.erase(remove_if(s1.begin(),s1.end(),::isspace),s1.end());
-        s2.erase(remove_if(s2.begin(),s2.end(),::isspace),s2.end());
-        return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
+        cout << s.find("  ")<<endl;
+         cout << "before segemenation fault1" << endl;
+        v = split(s, "  ");
+        if(v.size() == 3){
+        op = v[0];
+        s1 = v[1];
+        s2 = v[2];
+        }
+        count  = 1;
     }
-    else if (s.substr(0, 2) == "OR" && s.at(2) == ' ' && count == 2)
+    else if (s.find(" ")!= string::npos && count == 0)
     {
-        sText = s.substr(3, s.length());
-        size_t i = sText.find(" ");
-        s1 = sText.substr(0, i);
-        s2 = sText.substr(i + 1, s.length());
-        s1.erase(remove_if(s1.begin(),s1.end(),::isspace),s1.end());
-        s2.erase(remove_if(s2.begin(),s2.end(),::isspace),s2.end());
-        return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
+        cout << "before segemenation fault2" << endl;
+        v = split(s," ");
+        if(v.size() == 3){
+        op = v[0];
+        s1 = v[1];
+        s2 = v[2];
+        cout << op << s1 << s2<<endl;
+        }
     }
-    else if (s.substr(0, 2) == "AD" && s.at(2) == ' ' && count == 2)
-    {
-        sText = s.substr(3, s.length());
-        size_t i = sText.find(" ");
-        s1 = sText.substr(0, i);
-        s2 = sText.substr(i + 1, s.length());
-        return std::shared_ptr<QueryBase>(new AdjacentQuery(s1, s2));
-    }
-    else if (s.find(" ") == -1)
+    else
     {
         return std::shared_ptr<QueryBase>(new WordQuery(s));
-        //exit(1);
+    }
+
+    bool ans = !(s1.empty() && s2.empty());
+    if (op == "AND" && !s1.empty() && !s2.empty())
+    {
+
+        return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
+    }
+    else if (op == "OR" && !s1.empty() && !s2.empty())
+    {
+
+        return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
+    }
+    else if (op == "AD" && !s1.empty() && !s2.empty())
+    {
+
+        return std::shared_ptr<QueryBase>(new AdjacentQuery(s1, s2));
     }
     else
     {
@@ -137,24 +157,25 @@ std::ostream &print(std::ostream &os, const QueryResult &qr)
         os << "\"" << qr.sought << "\""
            << " occurs " << count << " times:" << std::endl;
         count = 0;
-        for (int i = 0 ; i < v.size(); i++)
+        for (int i = 0; i < v.size(); i++)
         {
-            if (v[i] + 1   ==  v[i + 1])
+            if (v[i] + 1 == v[i + 1])
             {
-                if ( i + 1 < v.size() - 1)
+                if (i + 1 < v.size() - 1)
                 {
-                os << "\t(line " << v[i] + 1 << ") "
-               << *(qr.file->begin() + v[i]) + "\n"
-               << "\t(line " << v[i + 1] + 1 << ") " << 
-              *(qr.file->begin() + v[i + 1]) + "\n"<<endl;
-                }else { 
-                     os << "\t(line " << v[i] + 1 << ") "
-               << *(qr.file->begin() + v[i]) + "\n"
-               << "\t(line " << v[i + 1] + 1 << ") " << 
-              *(qr.file->begin() + v[i + 1])<<endl;
-              }
-              //i++;
-            } 
+                    os << "\t(line " << v[i] + 1 << ") "
+                       << *(qr.file->begin() + v[i]) + "\n"
+                       << "\t(line " << v[i + 1] + 1 << ") " << *(qr.file->begin() + v[i + 1]) + "\n"
+                       << endl;
+                }
+                else
+                {
+                    os << "\t(line " << v[i] + 1 << ") "
+                       << *(qr.file->begin() + v[i]) + "\n"
+                       << "\t(line " << v[i + 1] + 1 << ") " << *(qr.file->begin() + v[i + 1]) << endl;
+                }
+                //i++;
+            }
         }
     }
     else
@@ -178,4 +199,14 @@ std::ostream &print(std::ostream &os, const QueryResult &qr)
   line 4
 
   line 4
-  line 5                    */
+  line 5      
+          return std::shared_ptr<QueryBase>(new AndQuery(s1, s2));
+                  return std::shared_ptr<QueryBase>(new OrQuery(s1, s2));
+                          return std::shared_ptr<QueryBase>(new AdjacentQuery(s1, s2));
+                                  return std::shared_ptr<QueryBase>(new WordQuery(s));
+                                          return std::shared_ptr<QueryBase>(new WordQuery("Unrecognized search"));
+
+
+
+
+              */
